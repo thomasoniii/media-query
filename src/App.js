@@ -61,6 +61,7 @@ class App extends Component {
               onChange = {(e) => { this.setState({ breakpoint : e.target.value}, this.determineIsMobile)}}
             />
         </p>
+        <p><a href = 'https://github.com/thomasoniii/media-query'>View the source</a></p>
       </div>
     );
   }
