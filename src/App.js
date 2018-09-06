@@ -1,66 +1,74 @@
 import React, { Component } from 'react';
 
+import NavBar             from './NavBar';
+import DesktopScreen      from './DesktopScreen';
+import OtherDesktopScreen from './OtherDesktopScreen';
+import MobileScreen       from './MobileScreen';
+
 import './App.css';
 
+const BREAKPOINT   = localStorage.getItem('breakpoint') || 470;
+const MOBILE_FIRST = localStorage.getItem('mobileFirst') === 'true' ? true : false;
+console.log("STORAGE : ", localStorage.getItem('mobileFirst'));
 class App extends Component {
 
   state = {
-    breakpoint : 470
+    breakpoint  : BREAKPOINT,
+    mobileFirst : MOBILE_FIRST,
+    screen      : MOBILE_FIRST
+      ? <MobileScreen getBreakpoint={() => this.state.breakpoint}/>
+      : <DesktopScreen/>
   }
 
   constructor(props) {
     super(props);
 
-    this.windowResize = this.windowResize.bind(this);
   }
 
-  windowResize() {
-    if (this.lastWidth !== window.innerWidth || this.lastHeight !== window.innerHeight) {
-      this.determineIsMobile();
-    }
-    this.lastWidth  = window.innerWidth;
-    this.lastHeight = window.innerHeight;
+  setMobileFirst(checked) {
+    this.setState({mobileFirst : checked});
+    localStorage.setItem('mobileFirst', checked);
   }
 
-  determineIsMobile() {
+  setBreakpoint(breakpoint) {
+    this.setState({breakpoint});
+    localStorage.setItem('brekapoint', breakpoint);
+  }
 
+  metaTagValue() {
     let meta = document.querySelector('meta[name="viewport"]');
-    meta.setAttribute('content', 'width=device-width');
-
-    if ( window.innerWidth < this.state.breakpoint ) {
-      this.setState( { isMobile : true } );
+    if (meta !== null) {
+      return meta.getAttribute('content');
     }
-    else {
-      this.setState( { isMobile : false } );
-      meta.setAttribute('content', '');
-    }
-
-    this.setState({width : window.innerWidth, height : window.innerHeight});
-
-  }
-
-  componentDidMount() {
-    this.determineIsMobile();
-    window.addEventListener('resize', this.windowResize);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize');
-    let meta = document.querySelector('meta[name="viewport"]');
-    meta.setAttribute('content', '');
   }
 
   render() {
+
+    console.log("RENDER APP", this.state.screen);
+
+    const metaContent = this.metaTagValue();
+
     return (
-      <div className={this.state.isMobile ? 'App mobile' : 'App desktop'}>
-        <p>{this.state.width} x { this.state.height }</p>
-        <p>This is a { this.state.isMobile ? "MOBILE" : "DESKTOP"} device</p>
+      <div className='App'>
+        { this.state.screen }
+        <NavBar
+          onDesktop1 = { () => this.setState({screen : <DesktopScreen/>})}
+          onDesktop2 = { () => this.setState({screen : <OtherDesktopScreen/>})}
+          onMobile   = { () => this.setState({screen : <MobileScreen getBreakpoint={() => this.state.breakpoint}/>})}
+        />
         <p>
           My width breakpoint is
             <input type = 'number' value = {this.state.breakpoint}
-              onChange = {(e) => { this.setState({ breakpoint : e.target.value}, this.determineIsMobile)}}
+              onChange = { (e) => { this.setBreakpoint(e.target.value) } }
             />
         </p>
+        <p>Start on mobile page on load:
+          <input type = 'checkbox'
+            checked={this.state.mobileFirst}
+            onChange={ (e) => this.setMobileFirst(e.target.checked) }
+          />
+        </p>
+        <p>The meta viewport tag{"'"}s content is currently <b>[{ metaContent }]</b> </p>
         <p><a href = 'https://github.com/thomasoniii/media-query'>View the source</a></p>
       </div>
     );
