@@ -32,7 +32,7 @@ class App extends Component {
 
   setBreakpoint(breakpoint) {
     this.setState({breakpoint});
-    localStorage.setItem('brekapoint', breakpoint);
+    localStorage.setItem('breakpoint', breakpoint);
   }
 
   metaTagValue() {

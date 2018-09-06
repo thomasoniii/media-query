@@ -42,8 +42,8 @@ export default class MobileScreen extends Component {
     componentDidMount() {
       this.determineIsMobile();
       console.log("MY MOBILE COMPONENT IS MOUNTING");
-      this.lastWidth  = window.innerWidth;
-      this.lastHeight = window.innerHeight;
+      this.lastWidth  = document.body.clientWidth;
+      this.lastHeight = document.body.clientHeight;
       window.addEventListener('resize', this.windowResize);
     }
 
